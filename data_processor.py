@@ -30,7 +30,7 @@ def process_and_analyze_data_with_mapping(filepath, column_map):
             if 'quantity' in chunk.columns and 'unit_price' in chunk.columns:
                 chunk['quantity'] = pd.to_numeric(chunk['quantity'], errors='coerce')
                 chunk['unit_price'] = pd.to_numeric(chunk['unit_price'], errors='coerce')
-                chunk['total_sales'] = chunk['quantity'] * chunk['unit_size']
+                chunk['total_sales'] = chunk['quantity'] * chunk['unit_price']
             
             if 'invoice_date' in chunk.columns:
                 chunk['invoice_date'] = pd.to_datetime(chunk['invoice_date'])
@@ -101,7 +101,6 @@ def process_and_analyze_data_with_mapping(filepath, column_map):
             else:
                 results["Top Customers"] = None
 
-            # New queries for additional graphs
             if all(col in df.columns for col in ['day_of_week', 'total_sales']):
                 query_sales_by_day = text("SELECT day_of_week, SUM(total_sales) as sales FROM uploaded_data GROUP BY day_of_week ORDER BY sales DESC")
                 sales_by_day_result = conn.execute(query_sales_by_day).fetchall()
