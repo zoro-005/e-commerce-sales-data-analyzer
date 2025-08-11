@@ -4,39 +4,49 @@ from sqlalchemy import create_engine, text
 def process_and_analyze_data_with_mapping(filepath, column_map):
     engine = create_engine('sqlite:///:memory:')
     try:
-        df = pd.read_csv(filepath, encoding='latin1')
+        # Use chunking to read large files efficiently
+        chunk_size = 50000  # Adjust as needed based on your system's memory
+        cleaned_df_list = []
         
-        mapped_columns = {key: value for key, value in column_map.items() if value}
+        for chunk in pd.read_csv(filepath, encoding='latin1', chunksize=chunk_size):
+            # The core processing logic is applied to each chunk
+            mapped_columns = {key: value for key, value in column_map.items() if value}
+            
+            rename_dict = {}
+            for original_col, new_col in {
+                mapped_columns.get('customer_id_col'): 'customer_id',
+                mapped_columns.get('quantity_col'): 'quantity',
+                mapped_columns.get('unit_price_col'): 'unit_price',
+                mapped_columns.get('invoice_date_col'): 'invoice_date',
+                mapped_columns.get('description_col'): 'product',
+                mapped_columns.get('country_col'): 'country',
+                mapped_columns.get('invoiceno_col'): 'invoiceno'
+            }.items():
+                if original_col and original_col in chunk.columns:
+                    rename_dict[original_col] = new_col
+            
+            chunk.rename(columns=rename_dict, inplace=True)
+            
+            # Perform cleaning and calculations on the chunk
+            if 'quantity' in chunk.columns and 'unit_price' in chunk.columns:
+                chunk['quantity'] = pd.to_numeric(chunk['quantity'], errors='coerce')
+                chunk['unit_price'] = pd.to_numeric(chunk['unit_price'], errors='coerce')
+                chunk['total_sales'] = chunk['quantity'] * chunk['unit_price']
+            
+            if 'invoice_date' in chunk.columns:
+                chunk['invoice_date'] = pd.to_datetime(chunk['invoice_date'])
+                chunk['day_of_week'] = chunk['invoice_date'].dt.day_name()
+                chunk['hour_of_day'] = chunk['invoice_date'].dt.hour
+            
+            # Remove rows with any missing values
+            chunk.dropna(inplace=True)
+            
+            cleaned_df_list.append(chunk)
         
-        rename_dict = {}
-        for original_col, new_col in {
-            mapped_columns.get('customer_id_col'): 'customer_id',
-            mapped_columns.get('quantity_col'): 'quantity',
-            mapped_columns.get('unit_price_col'): 'unit_price',
-            mapped_columns.get('invoice_date_col'): 'invoice_date',
-            mapped_columns.get('description_col'): 'product',
-            mapped_columns.get('country_col'): 'country',
-            mapped_columns.get('invoiceno_col'): 'invoiceno'
-        }.items():
-            if original_col:
-                rename_dict[original_col] = new_col
+        # Concatenate all cleaned chunks into a single DataFrame
+        df = pd.concat(cleaned_df_list, ignore_index=True)
         
-        df.rename(columns=rename_dict, inplace=True)
-        
-        df.dropna(inplace=True)
-        
-        if 'quantity' in df.columns and 'unit_price' in df.columns:
-            df['quantity'] = pd.to_numeric(df['quantity'], errors='coerce')
-            df['unit_price'] = pd.to_numeric(df['unit_price'], errors='coerce')
-            df['total_sales'] = df['quantity'] * df['unit_price']
-        
-        if 'invoice_date' in df.columns:
-            df['invoice_date'] = pd.to_datetime(df['invoice_date'])
-            df['day_of_week'] = df['invoice_date'].dt.day_name()
-            df['hour_of_day'] = df['invoice_date'].dt.hour
-        
-        df.dropna(inplace=True)
-
+        # Load the final, consolidated DataFrame into the in-memory database
         df.to_sql('uploaded_data', con=engine, if_exists='replace', index=False)
         
         results = {}
@@ -108,14 +118,6 @@ def process_and_analyze_data_with_mapping(filepath, column_map):
             else:
                 results["Sales by Hour"] = None
 
-            if all(col in df.columns for col in ['invoice_date', 'total_sales', 'invoiceno']):
-                query_aov_by_month = text("SELECT strftime('%Y-%m', invoice_date) as month, SUM(total_sales) / COUNT(DISTINCT invoiceno) as aov FROM uploaded_data GROUP BY month ORDER BY month")
-                aov_by_month_result = conn.execute(query_aov_by_month).fetchall()
-                results["AOV by Month"] = [{"month": row[0], "aov": round(row[1], 2)} for row in aov_by_month_result]
-            else:
-                results["AOV by Month"] = None
-            
-            # Final Combined Query
             if all(col in df.columns for col in ['invoice_date', 'total_sales', 'invoiceno']):
                 query_monthly_combined = text("SELECT strftime('%Y-%m', invoice_date) as month, SUM(total_sales) as monthly_sales, SUM(total_sales) / COUNT(DISTINCT invoiceno) as aov FROM uploaded_data GROUP BY month ORDER BY month")
                 monthly_combined_result = conn.execute(query_monthly_combined).fetchall()
