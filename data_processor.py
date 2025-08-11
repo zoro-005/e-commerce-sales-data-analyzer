@@ -5,7 +5,7 @@ def process_and_analyze_data_with_mapping(filepath, column_map):
     engine = create_engine('sqlite:///:memory:')
     try:
         # Use chunking to read large files efficiently
-        chunk_size = 10000  # Adjust as needed based on your system's memory
+        chunk_size = 50000  # Adjust as needed based on your system's memory
         cleaned_df_list = []
         
         for chunk in pd.read_csv(filepath, encoding='latin1', chunksize=chunk_size):
@@ -27,18 +27,16 @@ def process_and_analyze_data_with_mapping(filepath, column_map):
             
             chunk.rename(columns=rename_dict, inplace=True)
             
-            # Perform cleaning and calculations on the chunk
             if 'quantity' in chunk.columns and 'unit_price' in chunk.columns:
                 chunk['quantity'] = pd.to_numeric(chunk['quantity'], errors='coerce')
                 chunk['unit_price'] = pd.to_numeric(chunk['unit_price'], errors='coerce')
-                chunk['total_sales'] = chunk['quantity'] * chunk['unit_price']
+                chunk['total_sales'] = chunk['quantity'] * chunk['unit_size']
             
             if 'invoice_date' in chunk.columns:
                 chunk['invoice_date'] = pd.to_datetime(chunk['invoice_date'])
                 chunk['day_of_week'] = chunk['invoice_date'].dt.day_name()
                 chunk['hour_of_day'] = chunk['invoice_date'].dt.hour
             
-            # Remove rows with any missing values
             chunk.dropna(inplace=True)
             
             cleaned_df_list.append(chunk)
