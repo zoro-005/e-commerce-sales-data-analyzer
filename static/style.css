@@ -1,0 +1,112 @@
+:root {
+    --bg-color: #1a1a1a;
+    --card-bg-color: #2b2b2b;
+    --primary-color: #4CAF50;
+    --secondary-color: #2196F3;
+    --text-color: #ffffff;
+    --muted-color: #bbbbbb;
+    --border-color: #444444;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    min-height: 100vh;
+    margin: 0;
+}
+
+#starfield-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+.container {
+    position: relative;
+    z-index: 1;
+    margin-top: 5rem;
+    padding: 2rem;
+    background-color: var(--card-bg-color);
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border-color);
+}
+
+h1, h3, h4 {
+    color: var(--text-color);
+}
+
+p, label {
+    color: var(--muted-color);
+}
+
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--secondary-color);
+}
+
+.form-select, .form-control {
+    background-color: var(--card-bg-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+.form-select:focus, .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(76, 175, 80, 0.25);
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+.btn-primary:hover {
+    background-color: #45a049;
+    border-color: #45a049;
+}
+
+.btn-success {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+}
+.btn-success:hover {
+    background-color: #1976D2;
+    border-color: #1976D2;
+}
+
+#drop-zone {
+    border-color: var(--border-color) !important;
+    color: var(--muted-color);
+    background-color: var(--card-bg-color);
+    cursor: pointer;
+}
+#drop-zone.dragover {
+    border-color: var(--primary-color) !important;
+    background-color: #333333;
+}
+
+.key-metric-value {
+    color: var(--primary-color);
+}
+
+.table-dark {
+    --bs-table-bg: var(--border-color);
+    --bs-table-striped-bg: #333333;
+    --bs-table-striped-color: #ffffff;
+    --bs-table-hover-bg: #555555;
+}
+
+.chart-container {
+    position: relative;
+    height: 40vh;
+    max-width: 600px;
+    margin: auto;
+    margin-bottom: 2rem;
+}

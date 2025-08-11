@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Analyst Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../static/style.css">
+</head>
+<body>
+    <canvas id="starfield-canvas"></canvas>
+    <div class="container">
+        <h1 class="text-center mb-4">Data Analyst Dashboard</h1>
+        <p class="text-center" style="color:white;">Don't have a file? <a href="#" id="load-sample-data" style="color: #2196F3;">Load sample data to work on.</a></p>
+        <form id="upload-form">
+            <div class="mb-3 text-center">
+                <div id="drop-zone" class="p-5 border border-2 border-dashed rounded" style="color: #bbbbbb;">
+                    <span id="drop-zone-text">Drag & drop a CSV file here or click to browse</span>
+                    <div id="file-info" style="display: none;">
+                        <span id="file-name" class="fw-bold text-light"></span>
+                        <button type="button" id="clear-file" class="btn btn-sm btn-outline-danger ms-3">Clear</button>
+                    </div>
+                </div>
+                <input class="form-control d-none" type="file" id="csv-file" accept=".csv">
+            </div>
+            <div class="d-grid mt-3">
+                <button type="submit" class="btn btn-primary">Upload and Process</button>
+            </div>
+        </form>
+
+        <div id="loading" class="text-center" style="display:none;">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Processing...</span>
+            </div>
+            <p class="mt-2 text-light">Processing your file...</p>
+        </div>
+
+        <div id="column-mapping" class="mt-4" style="display:none;">
+            <hr>
+            <h3 class="text-light">Map Your Columns</h3>
+            <p style="color: #bbbbbb;">Please match your CSV columns to the required analysis fields.</p>
+            <form id="analysis-form">
+                <div class="row mb-3" id="column-mapping-fields">
+                    </div>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-success">Run Analysis</button>
+                </div>
+            </form>
+        </div>
+        
+        <div id="results">
+            </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+    <script src="../static/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+customer_id,sales,product
+101,150.50,widgetA
+102,250.75,widgetB
+101,75.00,widgetA
+103,300.00,widgetC
