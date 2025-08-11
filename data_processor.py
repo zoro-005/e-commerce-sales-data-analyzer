@@ -5,7 +5,7 @@ def process_and_analyze_data_with_mapping(filepath, column_map):
     engine = create_engine('sqlite:///:memory:')
     try:
         # Use chunking to read large files efficiently
-        chunk_size = 50000  # Adjust as needed based on your system's memory
+        chunk_size = 10000  # Adjust as needed based on your system's memory
         cleaned_df_list = []
         
         for chunk in pd.read_csv(filepath, encoding='latin1', chunksize=chunk_size):
